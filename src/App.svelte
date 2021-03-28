@@ -1,65 +1,56 @@
 <script lang="ts">
-  import logo from './assets/svelte.png'
-  import Counter from './lib/Counter.svelte'
+  import Logo from "./assets/svelte.png";
 </script>
 
-<main>
-  <img src={logo} alt="Svelte Logo" />
-  <h1>Hello Typescript!</h1>
+<div class="container">
+  <nav>
+    <ul class="menu">
+      <li class="menu-item">
+        <div class="tile tile-centered">
+          <div class="tile-icon"><img class="avatar" src={Logo} alt="Avatar"></div>
+          <div class="tile-content">Docker GUI</div>
+        </div>
+      </li>
+      <li class="divider"></li>
+      <li class="menu-item">
+        <a class="active" href="#menus">Container</a>
+      </li>
+      <li class="menu-item">
+        <a href="#menus">Images</a>
+      </li>
+      <li class="menu-item">
+        <a href="#menus">Settings</a>
+      </li>
+    </ul>
+  </nav>
+  <main>
+    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sint atque, eaque inventore necessitatibus doloremque expedita harum facere sapiente autem ab velit impedit repellat quasi laborum est eveniet pariatur accusantium esse.
+  </main>
+</div>
 
-  <Counter />
+<style lang="scss">
+  .container {
+    display: grid;
+    grid-template-columns: 16em 1fr;
+    grid-template-rows: 1fr;
+    gap: 0px 0px;
+    grid-template-areas: "navigation content";
+    height: 100vh;
+    max-height: 100vh;
+    margin: 0;
+    padding: 0;
 
-  <p>
-    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
-    apps.
-  </p>
+    nav {
+      grid-area: navigation;
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
-    the officially supported framework, also powered by Vite!
-  </p>
-</main>
-
-<style>
-  :root {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  }
-
-  main {
-    text-align: center;
-    padding: 1em;
-    margin: 0 auto;
-  }
-
-  img {
-    height: 16rem;
-    width: 16rem;
-  }
-
-  h1 {
-    color: #ff3e00;
-    text-transform: uppercase;
-    font-size: 4rem;
-    font-weight: 100;
-    line-height: 1.1;
-    margin: 2rem auto;
-    max-width: 14rem;
-  }
-
-  p {
-    max-width: 14rem;
-    margin: 1rem auto;
-    line-height: 1.35;
-  }
-
-  @media (min-width: 480px) {
-    h1 {
-      max-width: none;
+      .menu {
+        height: 100%;
+      }
     }
 
-    p {
-      max-width: none;
+    main {
+      grid-area: content;
+      overflow: auto;
     }
   }
 </style>
