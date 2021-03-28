@@ -1,39 +1,65 @@
 <script lang="ts">
-	import { onMount } from "svelte";
-	import { execute } from "tauri/api/process";
-	import Container from "./Container.svelte";
-	
-	let containers = [];
-	onMount(async () => {
-		let ids = (await execute("docker", ["ps", "-q"])).split("\n").filter(Boolean);
-		let stdout = await execute("docker", ["inspect", ...ids]);
-		containers = JSON.parse(stdout);
-		console.log(containers)
-	})
+  import logo from './assets/svelte.png'
+  import Counter from './lib/Counter.svelte'
 </script>
 
-<div class="container">
-	<section class="text-gray-400 bg-gray-900 body-font">
-		<div class="container px-5 py-5 mx-auto flex flex-wrap">
-			<div class="flex flex-wrap w-full">
-				<div class="w-full">
-					{#each containers as container}
-						<Container {container} />
-					{/each}
-				</div>
-			</div>
-		</div>
-	</section>
-</div>
+<main>
+  <img src={logo} alt="Svelte Logo" />
+  <h1>Hello Typescript!</h1>
 
-<style global lang="postcss">
+  <Counter />
 
-  /* only apply purgecss on utilities, per Tailwind docs */
-  /* purgecss start ignore */
-  @tailwind base;
-  @tailwind components;
-  /* purgecss end ignore */
+  <p>
+    Visit <a href="https://svelte.dev">svelte.dev</a> to learn how to build Svelte
+    apps.
+  </p>
 
-  @tailwind utilities;
+  <p>
+    Check out <a href="https://github.com/sveltejs/kit#readme">SvelteKit</a> for
+    the officially supported framework, also powered by Vite!
+  </p>
+</main>
 
+<style>
+  :root {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
+
+  main {
+    text-align: center;
+    padding: 1em;
+    margin: 0 auto;
+  }
+
+  img {
+    height: 16rem;
+    width: 16rem;
+  }
+
+  h1 {
+    color: #ff3e00;
+    text-transform: uppercase;
+    font-size: 4rem;
+    font-weight: 100;
+    line-height: 1.1;
+    margin: 2rem auto;
+    max-width: 14rem;
+  }
+
+  p {
+    max-width: 14rem;
+    margin: 1rem auto;
+    line-height: 1.35;
+  }
+
+  @media (min-width: 480px) {
+    h1 {
+      max-width: none;
+    }
+
+    p {
+      max-width: none;
+    }
+  }
 </style>
