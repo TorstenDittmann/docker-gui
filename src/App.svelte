@@ -1,30 +1,31 @@
 <script lang="ts">
-  import Logo from "./assets/svelte.png";
+  import Router from "svelte-spa-router";
+
+  import Navigation from "./lib/Navigation.svelte";
+  import Containers from "./routes/Containers.svelte";
+  import Images from "./routes/Images.svelte";
+  import Settings from "./routes/Settings.svelte";
+
+  const routes = {
+    // Exact path
+    "/": Containers,
+
+    // Using named parameters, with last being optional
+    "/images": Images,
+
+    // Wildcard parameter
+    "/settings": Settings,
+
+    // Catch-all
+    // This is optional, but if present it must be the last
+    "*": Containers,
+  };
 </script>
 
 <div class="container">
-  <nav>
-    <ul class="menu">
-      <li class="menu-item">
-        <div class="tile tile-centered">
-          <div class="tile-icon"><img class="avatar" src={Logo} alt="Avatar"></div>
-          <div class="tile-content">Docker GUI</div>
-        </div>
-      </li>
-      <li class="divider"></li>
-      <li class="menu-item">
-        <a class="active" href="#menus">Container</a>
-      </li>
-      <li class="menu-item">
-        <a href="#menus">Images</a>
-      </li>
-      <li class="menu-item">
-        <a href="#menus">Settings</a>
-      </li>
-    </ul>
-  </nav>
+  <Navigation />
   <main>
-    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sint atque, eaque inventore necessitatibus doloremque expedita harum facere sapiente autem ab velit impedit repellat quasi laborum est eveniet pariatur accusantium esse.
+    <Router {routes} />
   </main>
 </div>
 
@@ -40,17 +41,12 @@
     margin: 0;
     padding: 0;
 
-    nav {
-      grid-area: navigation;
-
-      .menu {
-        height: 100%;
-      }
-    }
-
     main {
       grid-area: content;
       overflow: auto;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
     }
   }
 </style>
