@@ -4,9 +4,11 @@
 )]
 
 mod cmd;
+mod docker_plugin;
 
 fn main() {
   tauri::AppBuilder::new()
+    .plugin(docker_plugin::DockerPlugin::new())
     .invoke_handler(|_webview, arg| {
       use cmd::Cmd::*;
       match serde_json::from_str(arg) {

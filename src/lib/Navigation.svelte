@@ -1,5 +1,24 @@
 <script lang="ts">
 import active from 'svelte-spa-router/active'
+import { promisified } from 'tauri/api/tauri'
+
+function test() {
+
+// then call it:
+promisified({
+  cmd: 'helloWorld',
+  count: 6,
+  payload: {
+    state: 'some string data',
+    data: 17
+  }
+}).then(response => {
+  console.log(response)
+}).catch(error => {
+  // do something with the Err() response string
+  console.error(error)
+})
+	}
 
 </script>
 <nav>
@@ -22,6 +41,9 @@ import active from 'svelte-spa-router/active'
         <li class="menu-item">
             <a href="#/settings" use:active={'/settings'}>Settings</a>
         </li>
+        <li class="menu-item">
+          <a on:click|once={test}>Test</a>
+      </li>
     </ul>
 </nav>
 
