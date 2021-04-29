@@ -12,15 +12,12 @@ build = "src/build.rs"
 [dependencies]
 serde_json = "1.0"
 serde = { version = "1.0", features = [ "derive" ] }
-tauri = { version = "0.11", features = [ "all-api" ] }
+tauri = { version = "1.0.0-beta-rc.0", features =["api-all"]}
 bollard = "0.10.1"
+futures = "0.3.13"
 
 [target."cfg(windows)".build-dependencies]
 winres = "0.1"
-
-[features]
-embedded-server = [ "tauri/embedded-server" ]
-no-server = [ "tauri/no-server" ]
 
 [[bin]]
 name = "docker-gui"

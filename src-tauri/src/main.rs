@@ -7,26 +7,15 @@ mod cmd;
 mod docker_plugin;
 
 fn main() {
-  tauri::AppBuilder::new()
+  tauri::Builder::default()
+    .invoke_handler(tauri::generate_handler![my_custom_command])
     .plugin(docker_plugin::DockerPlugin::new())
-    .invoke_handler(|_webview, arg| {
-      use cmd::Cmd::*;
-      match serde_json::from_str(arg) {
-        Err(e) => {
-          Err(e.to_string())
-        }
-        Ok(command) => {
-          match command {
-            // definitions for your custom commands from Cmd here
-            MyCustomCommand { argument } => {
-              //  your command code
-              println!("{}", argument);
-            }
-          }
-          Ok(())
-        }
-      }
-    })
-    .build()
-    .run();
+    .run(tauri::generate_context!())
+    .expect("error while running tauri application");
+}
+
+
+#[tauri::command]
+fn my_custom_command() {
+  println!("I was invoked from JS!");
 }

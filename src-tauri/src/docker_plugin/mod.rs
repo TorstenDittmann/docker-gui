@@ -1,49 +1,43 @@
-use tauri::Webview;
+use bollard::Docker;
+use tauri::Window;
 
-use self::commands::HelloWorld;
+// use self::commands::{hello_world};
 
 mod commands;
 
 pub struct DockerPlugin {
-
+  dockerInstance: Option<Docker>
 }
 
 impl DockerPlugin {
   pub fn new() -> Self {
-    Self {}
-  }
-}
-
-impl tauri::plugin::Plugin for DockerPlugin {
-  fn init_script(&self) -> Option<String> {
-    None
-  }
-
-  fn created(&self, _webview: &mut Webview<'_>) {
-
-  }
-
-  fn ready(&self, _webview: &mut Webview<'_>) {
-
-  }
-
-  fn extend_api(
-      &self, 
-      webview: &mut Webview<'_>, 
-      payload: &str
-  ) -> Result<bool, String> {
-    match serde_json::from_str(payload) {
-      Err(e) => Err(e.to_string()),
-      Ok(command) => {
-        handle_commands(command, webview)
-      }
+    Self {
+      dockerInstance: None
     }
   }
 }
 
-fn handle_commands(command: commands::DockerCmd, webview: &mut Webview) -> std::result::Result<bool, std::string::String> {
-  match command {
-    commands::DockerCmd::HelloWorld {callback, error } => HelloWorld(callback, error, webview)
+#[tauri::command]
+pub fn my_custom_command() -> Result<String, String> {
+  std::thread::sleep(std::time::Duration::from_secs(5));
+  Ok("HELLO WORLD!".into())
+}
+
+impl<M: tauri::Params> tauri::plugin::Plugin<M> for DockerPlugin {
+  fn initialization_script(&self) -> Option<String> {
+    Some("console.log('HELLO WORLD!')".into())
   }
-  Ok(true)
+
+  fn extend_api(
+      &mut self, 
+      message: tauri::InvokeMessage<M>
+  ) {
+    let command = message.command();
+
+    println!("{} handled", command);
+  }
+
+  fn name(&self) -> &'static str {
+    "docker"
+  }
 }

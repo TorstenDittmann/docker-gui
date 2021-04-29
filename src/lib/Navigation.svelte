@@ -1,18 +1,11 @@
 <script lang="ts">
 import active from 'svelte-spa-router/active'
-import { promisified } from 'tauri/api/tauri'
+import { invoke } from '@tauri-apps/api/tauri'
 
 function test() {
 
 // then call it:
-promisified({
-  cmd: 'helloWorld',
-  count: 6,
-  payload: {
-    state: 'some string data',
-    data: 17
-  }
-}).then(response => {
+invoke('my_custom_command').then(response => {
   console.log(response)
 }).catch(error => {
   // do something with the Err() response string
