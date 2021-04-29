@@ -1,18 +1,24 @@
 use bollard::Docker;
-use tauri::Window;
+use tauri::{plugin::{Plugin}, Params, Window, InvokeMessage};
 
-// use self::commands::{hello_world};
+use self::commands::*;
 
 mod commands;
 
-pub struct DockerPlugin {
-  dockerInstance: Option<Docker>
+pub struct DockerPlugin<M: Params> {
+  invoke_handler: Box<dyn Fn(InvokeMessage<M>) + Send + Sync>,
+  docker_instance: Option<Docker>
 }
 
-impl DockerPlugin {
-  pub fn new() -> Self {
+impl<M: Params> Default for DockerPlugin<M> {
+  fn default() -> Self {
     Self {
-      dockerInstance: None
+      docker_instance: None,
+      invoke_handler: Box::new(tauri::generate_handler![
+        connect_with_http,
+        hello_world,
+        my_custom_command
+      ]),
     }
   }
 }
@@ -23,7 +29,7 @@ pub fn my_custom_command() -> Result<String, String> {
   Ok("HELLO WORLD!".into())
 }
 
-impl<M: tauri::Params> tauri::plugin::Plugin<M> for DockerPlugin {
+impl<M: tauri::Params> tauri::plugin::Plugin<M> for DockerPlugin<M> {
   fn initialization_script(&self) -> Option<String> {
     Some("console.log('HELLO WORLD!')".into())
   }
@@ -31,10 +37,8 @@ impl<M: tauri::Params> tauri::plugin::Plugin<M> for DockerPlugin {
   fn extend_api(
       &mut self, 
       message: tauri::InvokeMessage<M>
-  ) {
-    let command = message.command();
-
-    println!("{} handled", command);
+  ) {;
+    (self.invoke_handler)(message)
   }
 
   fn name(&self) -> &'static str {
