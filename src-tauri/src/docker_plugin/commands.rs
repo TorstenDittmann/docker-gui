@@ -183,6 +183,12 @@ pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Resu
     }
   };
 
+  #[cfg(not(target_os = "windows"))]
+  #[tauri::command]
+  pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Result<String, String> {
+    return Err("Function only available in windows".to_string())
+  }
+
   match connection.info().await {
     Ok(result) => {
       println!("{:?}", result);
