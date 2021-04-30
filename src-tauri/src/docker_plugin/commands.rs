@@ -7,8 +7,8 @@ use bollard::container::ListContainersOptions;
 use std::collections::HashMap;
 use std::default::Default;
 
-async fn isConnectionAlive(instanceOption: Option<Docker>) -> Result<(), String> {
-  let instance = match instanceOption {
+async fn is_connection_alive(instance_option: Option<Docker>) -> Result<(), String> {
+  let instance = match instance_option {
     Some(result) => result,
     None => return Err("ERR_NOT_INITIALISED".to_string())
   };
@@ -52,11 +52,11 @@ pub async fn container_all() -> Result<Vec<ContainerSummaryInner>, String> {
 
 // Command: connect_with_http
 // Explanation: This command will create a unsecured HTTP connection with docker
-// Parameters: { url: String, useDefaults: bool }
+// Parameters: { url: String, use_defaults: bool }
 
 #[tauri::command]
-pub async fn connect_with_http(url: String, useDefaults: Option<bool>) -> Result<String, String> {
-    let connection = match useDefaults {
+pub async fn connect_with_http(url: String, use_defaults: Option<bool>) -> Result<String, String> {
+    let connection = match use_defaults {
       Some(result) => {
         if result == true {
           match Docker::connect_with_http_defaults() {
@@ -100,12 +100,12 @@ pub async fn connect_with_http(url: String, useDefaults: Option<bool>) -> Result
 
 // Command: connect_with_local
 // Explanation: This command will create a connection with docker using a local IP Address
-// Parameters: { address: String, useDefaults: bool }
+// Parameters: { address: String, use_defaults: bool }
 
 
 #[tauri::command]
-pub async fn connect_with_local(address: String, useDefaults: Option<bool>) -> Result<String, String> {
-  let connection = match useDefaults {
+pub async fn connect_with_local(address: String, use_defaults: Option<bool>) -> Result<String, String> {
+  let connection = match use_defaults {
     Some(result) => {
       if result == true {
         match Docker::connect_with_local_defaults() {
@@ -150,11 +150,12 @@ pub async fn connect_with_local(address: String, useDefaults: Option<bool>) -> R
 
 // Command: connect_with_pipe
 // Explanation: This command will create a connection with docker using a named pipe
-// Parameters: { pipe: String, useDefaults: bool }
+// Parameters: { pipe: String, use_defaults: bool }
 
+#[cfg(target_os = "windows")]
 #[tauri::command]
-pub async fn connect_with_pipe(pipe: String, useDefaults: Option<bool>) -> Result<String, String> {
-  let connection = match useDefaults {
+pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Result<String, String> {
+  let connection = match use_defaults {
     Some(result) => {
       if result == true {
         match Docker::connect_with_named_pipe_defaults() {

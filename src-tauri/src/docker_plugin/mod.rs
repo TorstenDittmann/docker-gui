@@ -28,6 +28,8 @@ impl<M: Params> Default for DockerPlugin<M> {
       docker_instance: None,
       invoke_handler: Box::new(tauri::generate_handler![
         connect_with_http,
+        connect_with_local,
+        connect_with_pipe,
         container_all,
         hello_world,
         my_custom_command

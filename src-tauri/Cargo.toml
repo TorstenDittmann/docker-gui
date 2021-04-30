@@ -13,7 +13,7 @@ build = "src/build.rs"
 serde_json = "1.0"
 serde = { version = "1.0", features = [ "derive" ] }
 tauri = { version = "1.0.0-beta-rc.4", features =["api-all"]}
-bollard = "0.10.1"
+bollard = { version = "0.10.1", features = ["ssl"]}
 once_cell = "1.7.2"
 futures = "0.3.13"
 
