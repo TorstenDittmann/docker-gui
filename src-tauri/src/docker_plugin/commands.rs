@@ -52,14 +52,35 @@ pub async fn container_all() -> Result<Vec<ContainerSummaryInner>, String> {
 
 // Command: connect_with_http
 // Explanation: This command will create a unsecured HTTP connection with docker
-// Parameters: { url: String }
+// Parameters: { url: String, useDefaults: bool }
 
 #[tauri::command]
-pub async fn connect_with_http(url: String) -> Result<String, String> {
-    let connection = match Docker::connect_with_http(&url, 10, API_DEFAULT_VERSION) {
-      Ok(result) => result,
-      Err(err) => {
-        return Err(format!("An error occoured attempting to connect. Error: {}", err))
+pub async fn connect_with_http(url: String, useDefaults: Option<bool>) -> Result<String, String> {
+    let connection = match useDefaults {
+      Some(result) => {
+        if result == true {
+          match Docker::connect_with_http_defaults() {
+            Ok(result) => result,
+            Err(err) => {
+              return Err(format!("An error occoured attempting to connect. Error: {}", err))
+            }
+          }
+        } else {
+          match Docker::connect_with_http(&url, 10, API_DEFAULT_VERSION) {
+            Ok(result) => result,
+            Err(err) => {
+              return Err(format!("An error occoured attempting to connect. Error: {}", err))
+            }
+          }
+        }
+      },
+      None => {
+        match Docker::connect_with_http(&url, 10, API_DEFAULT_VERSION) {
+          Ok(result) => result,
+          Err(err) => {
+            return Err(format!("An error occoured attempting to connect. Error: {}", err))
+          }
+        }
       }
     };
 
@@ -75,4 +96,103 @@ pub async fn connect_with_http(url: String) -> Result<String, String> {
         return Err(format!("An error occoured attempting to connect. Error: {}", err))
       }
     }
+}
+
+// Command: connect_with_local
+// Explanation: This command will create a connection with docker using a local IP Address
+// Parameters: { address: String, useDefaults: bool }
+
+
+#[tauri::command]
+pub async fn connect_with_local(address: String, useDefaults: Option<bool>) -> Result<String, String> {
+  let connection = match useDefaults {
+    Some(result) => {
+      if result == true {
+        match Docker::connect_with_local_defaults() {
+          Ok(result) => result,
+          Err(err) => {
+            return Err(format!("An error occoured attempting to connect. Error: {}", err))
+          }
+        }
+      } else {
+        match Docker::connect_with_local(&address, 10, API_DEFAULT_VERSION) {
+          Ok(result) => result,
+          Err(err) => {
+            return Err(format!("An error occoured attempting to connect. Error: {}", err))
+          }
+        }
+      }
+    },
+    None => {
+      match Docker::connect_with_local(&address, 10, API_DEFAULT_VERSION) {
+        Ok(result) => result,
+        Err(err) => {
+          return Err(format!("An error occoured attempting to connect. Error: {}", err))
+        }
+      }
+    }
+  };
+
+  match connection.info().await {
+    Ok(result) => {
+      println!("{:?}", result);
+
+      let mut docker_instance = docker_global_state().lock().await;
+
+      *docker_instance = Some(connection);
+      Ok("SUCCESS".to_string())
+    },
+    Err(err) => {
+      return Err(format!("An error occoured attempting to connect. Error: {}", err))
+    }
+  }
+}
+
+// Command: connect_with_pipe
+// Explanation: This command will create a connection with docker using a named pipe
+// Parameters: { pipe: String, useDefaults: bool }
+
+#[tauri::command]
+pub async fn connect_with_pipe(pipe: String, useDefaults: Option<bool>) -> Result<String, String> {
+  let connection = match useDefaults {
+    Some(result) => {
+      if result == true {
+        match Docker::connect_with_named_pipe_defaults() {
+          Ok(result) => result,
+          Err(err) => {
+            return Err(format!("An error occoured attempting to connect. Error: {}", err))
+          }
+        }
+      } else {
+        match Docker::connect_with_named_pipe(&pipe, 10, API_DEFAULT_VERSION) {
+          Ok(result) => result,
+          Err(err) => {
+            return Err(format!("An error occoured attempting to connect. Error: {}", err))
+          }
+        }
+      }
+    },
+    None => {
+      match Docker::connect_with_named_pipe(&pipe, 10, API_DEFAULT_VERSION) {
+        Ok(result) => result,
+        Err(err) => {
+          return Err(format!("An error occoured attempting to connect. Error: {}", err))
+        }
+      }
+    }
+  };
+
+  match connection.info().await {
+    Ok(result) => {
+      println!("{:?}", result);
+
+      let mut docker_instance = docker_global_state().lock().await;
+
+      *docker_instance = Some(connection);
+      Ok("SUCCESS".to_string())
+    },
+    Err(err) => {
+      return Err(format!("An error occoured attempting to connect. Error: {}", err))
+    }
+  }
 }
