@@ -1,4 +1,4 @@
-use bollard::{API_DEFAULT_VERSION, Docker, models::ContainerSummaryInner};
+use bollard::{API_DEFAULT_VERSION, Docker, models::{ContainerInspectResponse, ContainerSummaryInner, SystemInfo}};
 
 use crate::docker_plugin::docker_global_state;
 
@@ -7,15 +7,33 @@ use bollard::container::ListContainersOptions;
 use std::collections::HashMap;
 use std::default::Default;
 
-async fn is_connection_alive(instance_option: Option<Docker>) -> Result<(), String> {
+// Connection Commands
+async fn get_connection_status(instance_option: &Option<Docker>) -> Result<(), String> {
   let instance = match instance_option {
     Some(result) => result,
     None => return Err("ERR_NOT_INITIALISED".to_string())
   };
 
-  match instance.ping().await {
+  match instance.info().await {
     Ok(_data) => Ok(()),
     Err(err) => Err(err.to_string())
+  }
+}
+
+#[tauri::command]
+pub async fn connection_info() -> Result<SystemInfo, String> {
+  let docker_instance = docker_global_state().lock().await;
+
+  match get_connection_status(&docker_instance).await {
+    Ok(_data) => {},
+    Err(err) => {
+      return Err(err)
+    }
+  };
+
+  return match docker_instance.as_ref().unwrap().info().await {
+    Ok(data) => {Ok(data)}
+    Err(err) => {Err(err.to_string())}
   }
 }
 
@@ -37,13 +55,10 @@ pub async fn container_all() -> Result<Vec<ContainerSummaryInner>, String> {
   }
 
   //TODO: ADD CODE TO CHECK WHETHER CONNECTION IS ALIVE!
-
-  let mut filters = HashMap::new();
-  filters.insert("health", vec!["unhealthy"]);
   
   let options = Some(ListContainersOptions{
       all: true,
-      filters,
+      filters: HashMap::<&str, Vec<&str>>::new(),
       ..Default::default()
   });
 
@@ -55,7 +70,7 @@ pub async fn container_all() -> Result<Vec<ContainerSummaryInner>, String> {
 // Parameters: { url: String, use_defaults: bool }
 
 #[tauri::command]
-pub async fn connect_with_http(url: String, use_defaults: Option<bool>) -> Result<String, String> {
+pub async fn connect_with_http(url: String, use_defaults: Option<bool>) -> Result<SystemInfo, String> {
     let connection = match use_defaults {
       Some(result) => {
         if result == true {
@@ -86,11 +101,10 @@ pub async fn connect_with_http(url: String, use_defaults: Option<bool>) -> Resul
 
     match connection.info().await {
       Ok(result) => {
-        println!("{:?}", result);
         let mut docker_instance = docker_global_state().lock().await;
 
         *docker_instance = Some(connection);
-        Ok("SUCCESS".to_string())
+        Ok(result)
       },
       Err(err) => {
         return Err(format!("An error occoured attempting to connect. Error: {}", err))
@@ -104,7 +118,7 @@ pub async fn connect_with_http(url: String, use_defaults: Option<bool>) -> Resul
 
 
 #[tauri::command]
-pub async fn connect_with_local(address: String, use_defaults: Option<bool>) -> Result<String, String> {
+pub async fn connect_with_local(address: String, use_defaults: Option<bool>) -> Result<SystemInfo, String> {
   let connection = match use_defaults {
     Some(result) => {
       if result == true {
@@ -135,12 +149,10 @@ pub async fn connect_with_local(address: String, use_defaults: Option<bool>) -> 
 
   match connection.info().await {
     Ok(result) => {
-      println!("{:?}", result);
-
       let mut docker_instance = docker_global_state().lock().await;
 
       *docker_instance = Some(connection);
-      Ok("SUCCESS".to_string())
+      Ok(result)
     },
     Err(err) => {
       return Err(format!("An error occoured attempting to connect. Error: {}", err))
@@ -154,7 +166,7 @@ pub async fn connect_with_local(address: String, use_defaults: Option<bool>) -> 
 
 #[cfg(target_os = "windows")]
 #[tauri::command]
-pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Result<String, String> {
+pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Result<SystemInfo, String> {
   let connection = match use_defaults {
     Some(result) => {
       if result == true {
@@ -185,12 +197,10 @@ pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Resu
 
   match connection.info().await {
     Ok(result) => {
-      println!("{:?}", result);
-
       let mut docker_instance = docker_global_state().lock().await;
 
       *docker_instance = Some(connection);
-      Ok("SUCCESS".to_string())
+      Ok(result)
     },
     Err(err) => {
       return Err(format!("An error occoured attempting to connect. Error: {}", err))
@@ -202,4 +212,23 @@ pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Resu
 #[tauri::command]
 pub async fn connect_with_pipe(pipe: String, use_defaults: Option<bool>) -> Result<String, String> {
   return Err("Function only available in windows".to_string())
+}
+
+#[tauri::command]
+pub async fn container_get(container: String) -> Result<ContainerInspectResponse, String> {
+  let docker_instance = docker_global_state().lock().await;
+
+  match get_connection_status(&docker_instance).await {
+    Ok(_data) => {},
+    Err(err) => {
+      return Err(err)
+    }
+  };
+
+  let data = docker_instance.as_ref().unwrap().inspect_container(&container, None).await;
+
+  match data {
+    Ok(result) => {return Ok(result)}
+    Err(err) => {return Err(format!("Error: {}", err.to_string()))}
+  };
 }

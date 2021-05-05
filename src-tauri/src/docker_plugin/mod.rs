@@ -32,7 +32,9 @@ impl<M: Params> Default for DockerPlugin<M> {
         connect_with_pipe,
         container_all,
         hello_world,
-        my_custom_command
+        container_get,
+        my_custom_command,
+        connection_info
       ]),
     }
   }
@@ -46,7 +48,7 @@ pub fn my_custom_command() -> Result<String, String> {
 
 impl<M: tauri::Params> tauri::plugin::Plugin<M> for DockerPlugin<M> {
   fn initialization_script(&self) -> Option<String> {
-    Some("console.log('HELLO WORLD!')".into())
+    Some("console.log('🚀 Docker-Gui Docker Plugin Launched! Hello developer!')".into())
   }
 
   fn extend_api(
