@@ -1,17 +1,12 @@
 <script lang="ts">
+import { invoke } from '@tauri-apps/api/tauri';
+
 import active from 'svelte-spa-router/active'
-import { invoke } from '@tauri-apps/api/tauri'
+
 
 function test() {
-
-// then call it:
-invoke('plugin:docker|my_custom_command').then(response => {
-  console.log(response)
-}).catch(error => {
-  // do something with the Err() response string
-  console.error(error)
-})
-	}
+    invoke('my_custom_command')
+}
 
 </script>
 <nav>
