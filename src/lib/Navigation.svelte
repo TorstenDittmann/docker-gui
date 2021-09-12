@@ -1,25 +1,22 @@
 <script lang="ts">
+import { push } from 'svelte-spa-router';
+
     import active from 'svelte-spa-router/active'
 </script>
 <nav>
-    <ul class="menu bg-gray">
-        <li class="menu-item">
-            <div class="tile tile-centered">
-                <div class="tile-icon">
-                    <figure class="avatar" data-initial="D" />
-                </div>
-                <div class="tile-content">Docker GUI</div>
-            </div>
+    <ul>
+        <li>
+            <h2>Docker GUI</h2>
         </li>
-        <li class="divider" />
-        <li class="menu-item">
-            <a  use:active={'/'} href="#/">Container</a>
+        <hr />
+        <li on:click={() => push('/')} use:active={'/'}>
+            Container
         </li>
-        <li class="menu-item">
-            <a href="#/images" use:active={'/images'}>Images</a>
+        <li on:click={() => push('/images')} use:active={'/images'}>
+            Images
         </li>
-        <li class="menu-item">
-            <a href="#/settings" use:active={'/settings'}>Settings</a>
+        <li on:click={() => push('/settings')} use:active={'/settings'}>
+            Settings
         </li>
     </ul>
 </nav>
@@ -27,10 +24,24 @@
 <style lang="scss">
     nav {
         grid-area: navigation;
-
-        .menu {
+        ul {
             height: 100%;
             transform: none;
+
+            li {
+                cursor: pointer;
+                padding-left: 1rem;
+                font-size: 1.25rem;
+                line-height: 2.5rem;
+                &:hover {
+                    background-color: beige;
+                }
+                h2 {
+                    font-size: 1.5rem;
+                    margin: 1rem 0;
+                    font-weight: bold;
+                }
+            }
         }
     }
 </style>
