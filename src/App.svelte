@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { onMount } from "svelte";
+  import { invoke } from '@tauri-apps/api/tauri';
+  import { containers } from './stores/containers';
+
   import Router from "svelte-spa-router";
 
   import Navigation from "./lib/Navigation.svelte";
@@ -7,19 +11,22 @@
   import Settings from "./routes/Settings.svelte";
 
   const routes = {
-    // Exact path
     "/": Containers,
-
-    // Using named parameters, with last being optional
     "/images": Images,
-
-    // Wildcard parameter
     "/settings": Settings,
-
-    // Catch-all
-    // This is optional, but if present it must be the last
-    "*": Containers,
   };
+
+  onMount(async () => {
+    try {
+      const response = await invoke('containers_list')
+      console.log(response)
+      containers.set(JSON.parse(<string> response));
+    } catch (error) {
+      alert(error)
+      console.error(error)
+    }
+
+  });
 </script>
 
 <div class="container">

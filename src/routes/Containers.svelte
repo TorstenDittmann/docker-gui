@@ -1,11 +1,8 @@
 <script>
+import { containers } from "../stores/containers";
 import Container from "../lib/Container.svelte";
 
 </script>
-<Container />
-<Container />
-<Container />
-<Container />
-<Container />
-<Container />
-<Container />
+{#each $containers as container}
+    <Container {...container} />
+{/each}

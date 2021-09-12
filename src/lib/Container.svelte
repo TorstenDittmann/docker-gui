@@ -1,3 +1,11 @@
+<script lang="ts">
+    export let id: string;
+    export let names: string[];
+    export let image: string;
+    export let state: string;
+    export let status: string;
+</script>
+
 <div class="container tile tile-centered p-2 c-hand">
     <div class="tile-icon">
         <figure class="avatar" data-initial="MN">
@@ -6,10 +14,10 @@
     </div>
     <div class="tile-content">
         <div class="tile-title">
-            Machine Name <code>Image Name</code>
+            {names[0]} <code>{image}</code>
         </div>
         <small class="tile-subtitle text-gray"
-            >Port: 80</small
+            >Port: </small
         >
     </div>
     <div class="tile-action mr-2">

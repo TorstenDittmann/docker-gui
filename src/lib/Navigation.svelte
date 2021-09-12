@@ -1,13 +1,5 @@
 <script lang="ts">
-import { invoke } from '@tauri-apps/api/tauri';
-
-import active from 'svelte-spa-router/active'
-
-
-function test() {
-    invoke('my_custom_command')
-}
-
+    import active from 'svelte-spa-router/active'
 </script>
 <nav>
     <ul class="menu bg-gray">
@@ -29,9 +21,6 @@ function test() {
         <li class="menu-item">
             <a href="#/settings" use:active={'/settings'}>Settings</a>
         </li>
-        <li class="menu-item">
-          <a on:click|once={test}>Test</a>
-      </li>
     </ul>
 </nav>
 
