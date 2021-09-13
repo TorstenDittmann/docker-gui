@@ -19,8 +19,8 @@
   onMount(async () => {
     try {
       const response = await invoke('containers_list')
-      console.log(response)
       containers.set(JSON.parse(<string> response));
+      console.log($containers);
     } catch (error) {
       alert(error)
       console.error(error)

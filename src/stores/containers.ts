@@ -5,5 +5,8 @@ export type Container = {
     image: string;
     state: string;
     status: string;
+    labels: {
+        [key: string]: string;
+    }
 }
 export const containers = writable<Container[]>([]);
