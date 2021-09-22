@@ -26,7 +26,9 @@ jobs:
         sudo apt-get install -y webkit2gtk-4.0
     - name: install openssl (windows only)
       if: matrix.platform == 'windows-latest'
+      # run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
       run: vcpkg install openssl:x64-windows
+      run: vcpkg integrate install
     - name: install app dependencies and build it
       run: npm ci && npm run build
     - uses: tauri-apps/tauri-action@v0
