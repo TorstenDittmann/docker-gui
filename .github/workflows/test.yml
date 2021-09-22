@@ -28,7 +28,8 @@ jobs:
       if: matrix.platform == 'windows-latest'
       # run: echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
       run: |
-        vcpkg install openssl:x64-windows
+        echo "VCPKG_ROOT=$env:VCPKG_INSTALLATION_ROOT" | Out-File -FilePath $env:GITHUB_ENV -Append
+        vcpkg install openssl
         vcpkg integrate install
     - name: install app dependencies and build it
       run: npm ci && npm run build
