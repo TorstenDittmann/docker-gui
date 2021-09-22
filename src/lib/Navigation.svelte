@@ -1,7 +1,6 @@
 <script lang="ts">
-import { push } from 'svelte-spa-router';
-
-    import active from 'svelte-spa-router/active'
+    import { push } from "svelte-spa-router";
+    import active from "svelte-spa-router/active";
 </script>
 <nav>
     <ul>
@@ -27,7 +26,9 @@ import { push } from 'svelte-spa-router';
         ul {
             height: 100%;
             transform: none;
-
+            padding: 0;
+            list-style: none;
+                margin: 0;
             li {
                 cursor: pointer;
                 padding-left: 1rem;

@@ -1,31 +1,28 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { invoke } from '@tauri-apps/api/tauri';
-  import { containers } from './stores/containers';
 
   import Router from "svelte-spa-router";
 
   import Navigation from "./lib/Navigation.svelte";
+  import Container from "./routes/Container.svelte";
   import Containers from "./routes/Containers.svelte";
   import Images from "./routes/Images.svelte";
   import Settings from "./routes/Settings.svelte";
+  import { global, state } from "./stores";
 
   const routes = {
     "/": Containers,
+    "/container/:id": Container,
     "/images": Images,
     "/settings": Settings,
   };
 
   onMount(async () => {
-    try {
-      const response = await invoke('containers_list')
-      containers.set(JSON.parse(<string> response));
-      console.log($containers);
-    } catch (error) {
-      alert(error)
-      console.error(error)
+    if ($global.inTauri) {
+      await state.containers.load();
+    } else {
+      state.loadMock();
     }
-
   });
 </script>
 
@@ -52,7 +49,6 @@
       grid-area: content;
       overflow: auto;
       display: flex;
-      align-items: center;
       flex-direction: column;
     }
   }

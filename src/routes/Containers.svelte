@@ -1,16 +1,16 @@
-<script>
-import { containers } from "../stores/containers";
-import Container from "../lib/Container.svelte";
-
+<script lang="ts">
+    import { state } from "../stores";
+    import Container from "../lib/Container.svelte";
 </script>
 <table>
     <thead>
         <td>Name</td>
         <td>Image</td>
+        <td>Actions</td>
     </thead>
     <tbody>
-    {#each $containers as container}
-        <Container {...container} />
+    {#each $state.containers as container}
+        <Container container={container} />
     {/each}
     </tbody>
 </table>
