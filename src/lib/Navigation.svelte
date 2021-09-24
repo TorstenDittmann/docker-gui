@@ -2,19 +2,16 @@
     import { push } from "svelte-spa-router";
     import active from "svelte-spa-router/active";
 </script>
+
 <nav>
     <ul>
         <li>
             <h2>Docker GUI</h2>
         </li>
         <hr />
-        <li on:click={() => push('/')} use:active={'/'}>
-            Container
-        </li>
-        <li on:click={() => push('/images')} use:active={'/images'}>
-            Images
-        </li>
-        <li on:click={() => push('/settings')} use:active={'/settings'}>
+        <li on:click={() => push("/")} use:active={"/"}>Container</li>
+        <li on:click={() => push("/images")} use:active={"/images"}>Images</li>
+        <li on:click={() => push("/settings")} use:active={"/settings"}>
             Settings
         </li>
     </ul>
@@ -24,11 +21,10 @@
     nav {
         grid-area: navigation;
         ul {
-            height: 100%;
             transform: none;
             padding: 0;
             list-style: none;
-                margin: 0;
+            margin: 0;
             li {
                 cursor: pointer;
                 padding-left: 1rem;
