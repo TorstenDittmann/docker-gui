@@ -1,26 +1,62 @@
-
 #![cfg_attr(
   all(not(debug_assertions), target_os = "windows"),
   windows_subsystem = "windows"
 )]
+use futures::StreamExt;
+use json::JsonValue;
 use shiplift::Docker;
+
+struct GlobalState {
+  docker: Docker,
+}
+
+#[derive(serde::Serialize)]
+struct Payload {
+  message: String,
+}
 
 fn main() {
   tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![containers_list, images_list])
+    .manage(GlobalState {
+      docker: Docker::new().into(),
+    })
+    .invoke_handler(tauri::generate_handler![
+      containers_list,
+      images_list,
+      docker_ping,
+      init_process
+    ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
 
 #[tauri::command]
-async fn containers_list() -> Result<String, String> {
+async fn init_process(window: tauri::Window) {
   let docker = Docker::new();
-  match docker.containers().list(&Default::default()).await {
+  while let Some(event_result) = docker.events(&Default::default()).next().await {
+    match event_result {
+      Ok(event) => window.emit("docker", event),
+      Err(e) => window.emit("docker", e.to_string())
+    };
+  }
+}
+
+#[tauri::command]
+async fn docker_ping(state: tauri::State<'_, GlobalState>) -> Result<String, String> {
+  match state.docker.ping().await {
+    Err(e) => Err(e.to_string()),
+    Ok(pong) => Ok(pong),
+  }
+}
+
+#[tauri::command]
+async fn containers_list(state: tauri::State<'_, GlobalState>) -> Result<String, String> {
+  match state.docker.containers().list(&Default::default()).await {
     Err(e) => return Err(e.to_string()),
     Ok(containers) => {
-      let mut cont = json::JsonValue::new_array();
+      let mut cont = JsonValue::new_array();
       for c in containers {
-        let mut data = json::JsonValue::new_object();
+        let mut data = JsonValue::new_object();
         data["created"] = c.created.timestamp().into();
         data["command"] = c.command.into();
         data["id"] = c.id.into();
@@ -30,9 +66,9 @@ async fn containers_list() -> Result<String, String> {
         data["status"] = c.status.into();
         data["labels"] = c.labels.into();
 
-        let mut ports = json::JsonValue::new_array();
+        let mut ports = JsonValue::new_array();
         for port in c.ports {
-          let mut temp_port = json::JsonValue::new_object();
+          let mut temp_port = JsonValue::new_object();
           temp_port["ip"] = port.ip.into();
           temp_port["private_port"] = port.private_port.into();
           temp_port["public_port"] = port.public_port.into();
@@ -44,19 +80,17 @@ async fn containers_list() -> Result<String, String> {
       }
       Ok(json::stringify(cont))
     }
-
   }
 }
 
 #[tauri::command]
-async fn images_list() -> Result<String, String> {
-  let docker = Docker::new();
-  match docker.images().list(&Default::default()).await {
+async fn images_list(state: tauri::State<'_, GlobalState>) -> Result<String, String> {
+  match state.docker.images().list(&Default::default()).await {
     Err(e) => return Err(e.to_string()),
     Ok(images) => {
-      let mut cont = json::JsonValue::new_array();
+      let mut cont = JsonValue::new_array();
       for i in images {
-        let mut data = json::JsonValue::new_object();
+        let mut data = JsonValue::new_object();
         data["created"] = i.created.timestamp().into();
         data["id"] = i.id.into();
         data["parent_id"] = i.parent_id.into();
@@ -68,6 +102,5 @@ async fn images_list() -> Result<String, String> {
       }
       Ok(json::stringify(cont))
     }
-
   }
 }
