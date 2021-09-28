@@ -1,10 +1,13 @@
 name: "Svelte Check"
 on: [pull_request, push]
 
-steps:
-- uses: actions/checkout@v2
-- uses: actions/setup-node@v2
-  with:
-    node-version: "16"
-- run: npm install
-- run: npm run check
+jobs:
+  svelte-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: "16"
+    - run: npm install
+    - run: npm run check
