@@ -4,8 +4,8 @@
     import { pop } from "svelte-spa-router";
 
     import { Container, state } from "../stores/state";
-import Fa from "svelte-fa";
-import { faArrowLeft, faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
+    import Fa from "svelte-fa";
+    import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 
     export let params: {
         id?: string;
@@ -54,13 +54,13 @@ import { faArrowLeft, faPlay, faStop, faTrash } from "@fortawesome/free-solid-sv
     }
 
     .action {
-        margin-right: .25rem;
-        margin-left: .25rem;
+        margin-right: 0.25rem;
+        margin-left: 0.25rem;
         cursor: pointer;
 
         &.back {
             margin-right: 1.25rem;
-        } 
+        }
         &:hover {
             color: green;
         }

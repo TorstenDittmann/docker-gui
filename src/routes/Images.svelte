@@ -15,7 +15,7 @@
 </script>
 
 <Header>
-    <input bind:value={search} placeholder="Search..." autofocus />
+    <input bind:value={search} placeholder="Search..." />
 </Header>
 <h2>Images</h2>
 <table>
