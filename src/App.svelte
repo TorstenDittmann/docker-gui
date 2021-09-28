@@ -20,6 +20,7 @@
   onMount(async () => {
     if ($global.inTauri) {
       await state.containers.load();
+      await state.images.load();
     } else {
       state.loadMock();
     }

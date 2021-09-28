@@ -1,5 +1,5 @@
-name: "test-on-pr"
-on: [pull_request, push]
+name: "Tauri Build"
+on: [pull_request]
 
 jobs:
   test-tauri:

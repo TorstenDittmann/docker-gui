@@ -1,0 +1,1 @@
+export const includes = (haystack: string, needle: string): boolean => haystack.toLowerCase().trim().includes(needle.trim().toLowerCase());

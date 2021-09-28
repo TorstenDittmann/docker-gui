@@ -1,9 +1,11 @@
 <script lang="ts">
-    import Fa from "svelte-fa";
-    import { faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
+    import Header from "../lib/Header.svelte";
     import { onMount } from "svelte";
+    import { pop } from "svelte-spa-router";
 
     import { Container, state } from "../stores/state";
+import Fa from "svelte-fa";
+import { faArrowLeft, faPlay, faStop, faTrash } from "@fortawesome/free-solid-svg-icons";
 
     export let params: {
         id?: string;
@@ -16,9 +18,14 @@
     });
 </script>
 
-<div class="container">
+<Header>
+    <span class="action back" on:click={pop}><Fa icon={faArrowLeft} /></span>
     {#if container}
         <h1>{container.names[0]}</h1>
+    {/if}
+</Header>
+<div class="container">
+    {#if container}
         <h2>{container.image}</h2>
         <p>id: {container.id}</p>
         <p>state: {container.state}</p>
@@ -40,5 +47,22 @@
 <style lang="scss">
     .container {
         text-align: left;
+    }
+
+    h1 {
+        margin-right: 1.5rem;
+    }
+
+    .action {
+        margin-right: .25rem;
+        margin-left: .25rem;
+        cursor: pointer;
+
+        &.back {
+            margin-right: 1.25rem;
+        } 
+        &:hover {
+            color: green;
+        }
     }
 </style>

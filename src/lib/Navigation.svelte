@@ -8,7 +8,6 @@
         <li>
             <h2>Docker GUI</h2>
         </li>
-        <hr />
         <li on:click={() => push("/")} use:active={"/"}>Container</li>
         <li on:click={() => push("/images")} use:active={"/images"}>Images</li>
         <li on:click={() => push("/settings")} use:active={"/settings"}>
