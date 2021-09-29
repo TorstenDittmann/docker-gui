@@ -70,7 +70,6 @@ const createTauriStore = () => {
         images: {
             load: async () => {
                 const response = await invoke('images_list');
-                console.log(JSON.parse(<string>response));
                 return update(n => {
                     n.images = JSON.parse(<string>response);
                     return n;
@@ -94,7 +93,6 @@ event.listen<DockerEvent>('docker', async ({ payload }) => {
         case "stop":
         case "kill":
         case "die":
-            console.log(payload.status)
             state.containers.update({
                 Id: payload.id,
                 State: payload.status
