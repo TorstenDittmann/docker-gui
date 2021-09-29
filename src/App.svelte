@@ -22,12 +22,19 @@
     onMount(async () => {
         if ($global.inTauri) {
             invoke("init_process");
-            await state.containers.load();
-            await state.images.load();
+            await load();
+
+            //TODO: replace interval
+            setInterval(load, 5000);
         } else {
             state.loadMock();
         }
     });
+
+    const load = async () => {
+        await state.containers.load();
+        await state.images.load();
+    }
 </script>
 
 <div class="container">

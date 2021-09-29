@@ -51,7 +51,6 @@ const createTauriStore = () => {
                 const response = await invoke('containers_list');
                 return update(n => {
                     n.containers = JSON.parse(<string>response);
-                    console.log(n.containers)
                     return n;
                 });
             },
@@ -92,7 +91,6 @@ type DockerEvent = {
 event.listen<DockerEvent>('docker', async ({ payload }) => {
     switch (payload.Action) {
         case "stop":
-        case "start":
         case "kill":
             state.containers.update({
                 id: payload.id,
@@ -100,6 +98,7 @@ event.listen<DockerEvent>('docker', async ({ payload }) => {
             })
             break;
 
+        case "start":
         case "create":
             await state.containers.load();
             break;

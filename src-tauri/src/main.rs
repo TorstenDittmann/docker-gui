@@ -5,6 +5,7 @@
 use futures::StreamExt;
 use json::JsonValue;
 use shiplift::Docker;
+use std::time::Duration;
 
 struct GlobalState {
   docker: Docker,
@@ -24,7 +25,11 @@ fn main() {
       containers_list,
       images_list,
       docker_ping,
-      init_process
+      init_process,
+      stop_container,
+      start_container,
+      restart_container,
+      delete_container
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
@@ -34,10 +39,11 @@ fn main() {
 async fn init_process(window: tauri::Window) {
   let docker = Docker::new();
   while let Some(event_result) = docker.events(&Default::default()).next().await {
-    match event_result {
-      Ok(event) => window.emit("docker", event),
-      Err(e) => window.emit("docker", e.to_string())
-    };
+    if let Ok(event) = event_result {
+      if let Err(e) = window.emit("docker", event) {
+        eprintln!("Error: {}", e)
+      }
+    }
   }
 }
 
@@ -102,5 +108,39 @@ async fn images_list(state: tauri::State<'_, GlobalState>) -> Result<String, Str
       }
       Ok(json::stringify(cont))
     }
+  }
+}
+
+#[tauri::command]
+async fn stop_container(container_id: String, state: tauri::State<'_, GlobalState>) -> Result<(), String> {
+  let wait = Some(Duration::new(5, 0));
+  match state.docker.containers().get(&container_id).stop(wait).await {
+    Err(e) => return Err(e.to_string()),
+    Ok(_c) => return Ok(())
+  }
+}
+
+#[tauri::command]
+async fn delete_container(container_id: String, state: tauri::State<'_, GlobalState>) -> Result<(), String> {
+  match state.docker.containers().get(&container_id).delete().await {
+    Err(e) => return Err(e.to_string()),
+    Ok(_c) => return Ok(())
+  }
+}
+
+#[tauri::command]
+async fn start_container(container_id: String, state: tauri::State<'_, GlobalState>) -> Result<(), String> {
+  match state.docker.containers().get(&container_id).start().await {
+    Err(e) => return Err(e.to_string()),
+    Ok(_c) => return Ok(())
+  }
+}
+
+#[tauri::command]
+async fn restart_container(container_id: String, state: tauri::State<'_, GlobalState>) -> Result<(), String> {
+  let wait = Some(Duration::new(5, 0));
+  match state.docker.containers().get(&container_id).restart(wait).await {
+    Err(e) => return Err(e.to_string()),
+    Ok(_c) => return Ok(())
   }
 }

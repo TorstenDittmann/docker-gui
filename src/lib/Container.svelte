@@ -1,20 +1,22 @@
 <script lang="ts">
     import Fa from 'svelte-fa';
-    import { faPlay, faStop, faTrash } from '@fortawesome/free-solid-svg-icons';
+    import { faPlay, faStop, faSync, faTrash } from '@fortawesome/free-solid-svg-icons';
     import { push } from 'svelte-spa-router';
 
     import type { Container } from "../stores/state";
+import { docker } from '../docker';
 
     export let container: Container;
 </script>
 
-<tr class="container" on:click={() => push(`/container/${container.id}`)}>
-    <td>{container.names[0]}</td>
-    <td>{container.image}</td>
+<tr class="container">
+    <td on:click={() => push(`/container/${container.id}`)}>{container.names[0]}</td>
+    <td on:click={() => push(`/container/${container.id}`)}>{container.image}</td>
     <td class="action">
-        <span><Fa icon={faPlay} /></span>
-        <span><Fa icon={faStop} /></span>
-        <span><Fa icon={faTrash} /></span>
+        <span on:click={() => docker.container.start(container.id)}><Fa icon={faPlay} /></span>
+        <span on:click={() => docker.container.stop(container.id)}><Fa icon={faStop} /></span>
+        <span on:click={() => docker.container.restart(container.id)}><Fa icon={faSync} /></span>
+        <span on:click={() => docker.container.delete(container.id)}><Fa icon={faTrash} /></span>
     </td>
 </tr>
 

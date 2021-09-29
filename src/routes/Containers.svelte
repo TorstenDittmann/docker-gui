@@ -33,7 +33,6 @@
                 } else {
                     prev.singles.push(curr);
                 }
-                console.log(prev);
                 return prev;
             },
             {
