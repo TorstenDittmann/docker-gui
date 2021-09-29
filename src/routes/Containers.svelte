@@ -50,6 +50,11 @@
 </Header>
 <div class="containers">
     {#if $state.containers.length !== 0}
+        <div class="section">
+            {#each filteredContainers.singles as container}
+                <ContainerComponent {container} />
+            {/each}
+        </div>
         {#each Object.keys(filteredContainers.compose) as compose}
             <div class="section">
                 <h2>{compose}</h2>
@@ -58,11 +63,6 @@
                 {/each}
             </div>
         {/each}
-        <div class="section">
-            {#each filteredContainers.singles as container}
-                <ContainerComponent {container} />
-            {/each}
-        </div>
     {:else}
         no containers
     {/if}

@@ -109,7 +109,7 @@ event.listen<DockerEvent>('docker', async ({ payload }) => {
             break;
 
         default:
-            console.log(payload)
+            console.log(payload.Action, payload)
             break;
     }
 });

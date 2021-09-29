@@ -63,7 +63,7 @@
             }
 
             &.starting {
-                color: yellow;
+                color: orange;
             }
         }
 
