@@ -92,9 +92,11 @@ event.listen<DockerEvent>('docker', async ({ payload }) => {
     switch (payload.Action) {
         case "stop":
         case "kill":
+        case "die":
+            console.log(payload.status)
             state.containers.update({
                 id: payload.id,
-                status: payload.status
+                state: payload.status
             })
             break;
 

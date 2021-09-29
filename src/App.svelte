@@ -25,7 +25,7 @@
             await load();
 
             //TODO: replace interval
-            setInterval(load, 5000);
+            //setInterval(load, 5000);
         } else {
             state.loadMock();
         }

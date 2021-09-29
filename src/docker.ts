@@ -13,6 +13,9 @@ export const docker = {
         }),
         restart: async (containerId: string) => invoke("restart_container", {
             containerId
+        }),
+        logs: async (containerId: string) => invoke("container_logs", {
+            containerId
         })
     }
 }

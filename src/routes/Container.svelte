@@ -6,15 +6,28 @@
     import { Container, state } from "../stores/state";
     import Fa from "svelte-fa";
     import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+    import { docker } from "../docker";
+    import { event } from "@tauri-apps/api";
 
     export let params: {
         id?: string;
     } = {};
 
     let container: Container;
+    let containerElement: HTMLDivElement;
+
+    let logs = [];
 
     onMount(() => {
         container = $state.containers.find((c) => c.id === params.id);
+        docker.container.logs(params.id);
+
+        event.listen<string>("logs", (event) => {
+            if (event.event === "logs") {
+                logs = [...logs, event.payload];
+                containerElement.scrollIntoView(false);
+            }
+        });
     });
 </script>
 
@@ -22,31 +35,24 @@
     <span class="action back" on:click={pop}><Fa icon={faArrowLeft} /></span>
     {#if container}
         <h1>{container.names[0]}</h1>
+        <h1>{container.image}</h1>
     {/if}
 </Header>
-<div class="container">
-    {#if container}
-        <h2>{container.image}</h2>
-        <p>id: {container.id}</p>
-        <p>state: {container.state}</p>
-        <p>status: {container.status}</p>
-        <p>labels:</p>
-        <table>
-            {#each Object.keys(container.labels) as key}
-                <tr>
-                    <td>{key}</td>
-                    <td>{container.labels[key]}</td>
-                </tr>
-            {/each}
-        </table>
-    {:else}
-        loading
-    {/if}
+<div class="logs" bind:this={containerElement}>
+    {#each logs as log}
+        <p>{log}</p>
+    {/each}
 </div>
 
 <style lang="scss">
-    .container {
+    .logs {
         text-align: left;
+
+        p {
+            font-size: 0.75rem;
+            margin: 0;
+            padding: 0;
+        }
     }
 
     h1 {
