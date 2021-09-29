@@ -6,13 +6,23 @@ use futures::StreamExt;
 use shiplift::tty::TtyChunk;
 use shiplift::{ContainerListOptions, Docker, LogsOptions};
 use std::time::Duration;
+use tauri::{
+  Builder, CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+};
 
 struct GlobalState {
   docker: Docker,
 }
 
 fn main() {
-  tauri::Builder::default()
+  let quit = CustomMenuItem::new("quit".to_string(), "Quit");
+  let show = CustomMenuItem::new("show".to_string(), "Dashboard");
+  let tray_menu = SystemTrayMenu::new()
+    .add_item(show)
+    .add_native_item(SystemTrayMenuItem::Separator)
+    .add_item(quit);
+  let system_tray = SystemTray::new().with_menu(tray_menu);
+  Builder::default()
     .manage(GlobalState {
       docker: Docker::new().into(),
     })
@@ -27,6 +37,20 @@ fn main() {
       restart_container,
       delete_container
     ])
+    .system_tray(system_tray)
+    .on_system_tray_event(|app, event| match event {
+      SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
+        "quit" => {
+          std::process::exit(0);
+        }
+        "show" => {
+          let window = app.get_window("main").unwrap();
+          window.show().unwrap();
+        }
+        _ => {}
+      },
+      _ => {}
+    })
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
