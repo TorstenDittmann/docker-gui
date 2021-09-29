@@ -15,40 +15,41 @@
     export let container: Container;
 </script>
 
-<tr class="container">
-
-    <td on:click={() => push(`/container/${container.id}`)}>
+<div class="container">
+    <span on:click={() => push(`/container/${container.Id}`)}>
         <span
             class="state"
-            class:running={container.state === "running"}
-            class:stopped={container.state === "exited"}
-            class:starting={['kill', 'die'].includes(container.state)}
+            class:running={container.State === "running"}
+            class:stopped={container.State === "exited"}
+            class:starting={['kill', 'die'].includes(container.State)}
         >
             <Fa icon={faServer} />
         </span>
-        {container.names[0]}
-    </td>
-    <td>{container.image}</td>
-    <td class="action">
-        <span on:click={() => docker.container.start(container.id)}>
+        {container.Names[0]}
+    </span>
+    <span class="action">
+        <span on:click={() => docker.container.start(container.Id)}>
             <Fa icon={faPlay} />
         </span>
-        <span on:click={() => docker.container.stop(container.id)}>
+        <span on:click={() => docker.container.stop(container.Id)}>
             <Fa icon={faStop} />
         </span>
-        <span on:click={() => docker.container.restart(container.id)}>
+        <span on:click={() => docker.container.restart(container.Id)}>
             <Fa icon={faSync} />
         </span>
-        <span on:click={() => docker.container.delete(container.id)}>
+        <span on:click={() => docker.container.delete(container.Id)}>
             <Fa icon={faTrash} />
         </span>
-    </td>
-</tr>
+    </span>
+</div>
 
 <style lang="scss">
     .container {
         line-height: 3rem;
         cursor: pointer;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
 
         .state {
             font-size: 1.5rem;

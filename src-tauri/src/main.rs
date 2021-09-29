@@ -3,9 +3,8 @@
   windows_subsystem = "windows"
 )]
 use futures::StreamExt;
-use json::JsonValue;
 use shiplift::tty::TtyChunk;
-use shiplift::{Docker, LogsOptions};
+use shiplift::{ContainerListOptions, Docker, LogsOptions};
 use std::time::Duration;
 
 struct GlobalState {
@@ -47,17 +46,17 @@ async fn init_process(window: tauri::Window) {
 #[tauri::command]
 async fn container_logs(container_id: String, window: tauri::Window) {
   let docker = Docker::new();
-  let mut logs_stream = docker
-    .containers()
-    .get(&container_id)
-    .logs(&LogsOptions::builder().stdout(true).stderr(true).follow(true).build());
+  let mut logs_stream = docker.containers().get(&container_id).logs(
+    &LogsOptions::builder()
+      .stdout(true)
+      .stderr(true)
+      .follow(true)
+      .build(),
+  );
 
   while let Some(log_result) = logs_stream.next().await {
     if let Ok(chunk) = log_result {
-      if let Err(e) = window.emit(
-        "logs",
-        return_chunk(chunk),
-      ) {
+      if let Err(e) = window.emit("logs", return_chunk(chunk)) {
         eprintln!("Error: {}", e)
       }
     }
@@ -66,9 +65,9 @@ async fn container_logs(container_id: String, window: tauri::Window) {
 
 fn return_chunk(chunk: TtyChunk) -> String {
   match chunk {
-      TtyChunk::StdOut(bytes) => String::from(std::str::from_utf8(&bytes).unwrap()),
-      TtyChunk::StdErr(bytes) => String::from(std::str::from_utf8(&bytes).unwrap()),
-      TtyChunk::StdIn(_) => String::new()
+    TtyChunk::StdOut(bytes) => String::from(std::str::from_utf8(&bytes).unwrap()),
+    TtyChunk::StdErr(bytes) => String::from(std::str::from_utf8(&bytes).unwrap()),
+    TtyChunk::StdIn(_) => String::new(),
   }
 }
 
@@ -82,37 +81,14 @@ async fn docker_ping(state: tauri::State<'_, GlobalState>) -> Result<String, Str
 
 #[tauri::command]
 async fn containers_list(state: tauri::State<'_, GlobalState>) -> Result<String, String> {
-  let options = shiplift::ContainerListOptions::builder().all().build();
-
-  match state.docker.containers().list(&options).await {
+  match state
+    .docker
+    .containers()
+    .list(&ContainerListOptions::builder().all().build())
+    .await
+  {
     Err(e) => return Err(e.to_string()),
-    Ok(containers) => {
-      let mut cont = JsonValue::new_array();
-      for c in containers {
-        let mut data = JsonValue::new_object();
-        data["created"] = c.created.timestamp().into();
-        data["command"] = c.command.into();
-        data["id"] = c.id.into();
-        data["names"] = c.names.into();
-        data["image"] = c.image.into();
-        data["state"] = c.state.into();
-        data["status"] = c.status.into();
-        data["labels"] = c.labels.into();
-
-        let mut ports = JsonValue::new_array();
-        for port in c.ports {
-          let mut temp_port = JsonValue::new_object();
-          temp_port["ip"] = port.ip.into();
-          temp_port["private_port"] = port.private_port.into();
-          temp_port["public_port"] = port.public_port.into();
-          temp_port["typ"] = port.typ.into();
-          ports.push(temp_port).err();
-        }
-        data["ports"] = ports;
-        cont.push(data).err();
-      }
-      Ok(json::stringify(cont))
-    }
+    Ok(containers) => return Ok(serde_json::to_string(&containers).unwrap()),
   }
 }
 
@@ -120,21 +96,7 @@ async fn containers_list(state: tauri::State<'_, GlobalState>) -> Result<String,
 async fn images_list(state: tauri::State<'_, GlobalState>) -> Result<String, String> {
   match state.docker.images().list(&Default::default()).await {
     Err(e) => return Err(e.to_string()),
-    Ok(images) => {
-      let mut cont = JsonValue::new_array();
-      for i in images {
-        let mut data = JsonValue::new_object();
-        data["created"] = i.created.timestamp().into();
-        data["id"] = i.id.into();
-        data["parent_id"] = i.parent_id.into();
-        data["labels"] = i.labels.into();
-        data["repo_tags"] = i.repo_tags.into();
-        data["repo_digests"] = i.repo_digests.into();
-        data["virtual_size"] = i.virtual_size.into();
-        cont.push(data).err();
-      }
-      Ok(json::stringify(cont))
-    }
+    Ok(containers) => return Ok(serde_json::to_string(&containers).unwrap()),
   }
 }
 
@@ -143,12 +105,11 @@ async fn stop_container(
   container_id: String,
   state: tauri::State<'_, GlobalState>,
 ) -> Result<(), String> {
-  let wait = Some(Duration::new(5, 0));
   match state
     .docker
     .containers()
     .get(&container_id)
-    .stop(wait)
+    .stop(Some(Duration::new(5, 0)))
     .await
   {
     Err(e) => return Err(e.to_string()),

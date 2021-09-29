@@ -17,13 +17,16 @@
     $: filteredContainers = $state.containers
         .filter((container) => {
             return search !== ""
-                ? container.names.some((name) => includes(name, search))
+                ? container.Names.some((name) => includes(name, search))
                 : true;
         })
         .reduce<UIContainers>(
             (prev: UIContainers, curr: Container) => {
                 const project =
-                    curr.labels["com.docker.compose.project"] ?? false;
+                curr?.Labels && "com.docker.compose.project" in curr?.Labels
+                        ? curr.Labels["com.docker.compose.project"]
+                        : false;
+
                 if (project) {
                     if (!(project in prev.compose)) {
                         prev.compose[project] = [];
@@ -45,35 +48,32 @@
 <Header>
     <input bind:value={search} placeholder="Search..." />
 </Header>
-<table>
+<div class="containers">
     {#if $state.containers.length !== 0}
         {#each Object.keys(filteredContainers.compose) as compose}
-            <tbody>
+            <div class="section">
                 <h2>{compose}</h2>
                 {#each filteredContainers.compose[compose] as service}
                     <ContainerComponent container={service} />
                 {/each}
-            </tbody>
+            </div>
         {/each}
-        <tbody>
+        <div class="section">
             {#each filteredContainers.singles as container}
                 <ContainerComponent {container} />
             {/each}
-        </tbody>
+        </div>
     {:else}
         no containers
     {/if}
-</table>
+    </div>
 
 <style lang="scss">
-    table {
+    .containers {
         width: 100%;
 
-        tbody {
-            h2 {
-                margin: 0;
-                line-height: 3rem;
-            }
+        .section {
+            width: 100%;
         }
     }
 

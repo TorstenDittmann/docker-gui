@@ -19,13 +19,13 @@
     let logs = [];
 
     onMount(() => {
-        container = $state.containers.find((c) => c.id === params.id);
+        container = $state.containers.find((c) => c.Id === params.id);
         docker.container.logs(params.id);
 
         event.listen<string>("logs", (event) => {
             if (event.event === "logs") {
                 logs = [...logs, event.payload];
-                containerElement.scrollIntoView(false);
+                containerElement?.scrollIntoView(false);
             }
         });
     });
@@ -34,8 +34,8 @@
 <Header>
     <span class="action back" on:click={pop}><Fa icon={faArrowLeft} /></span>
     {#if container}
-        <h1>{container.names[0]}</h1>
-        <h1>{container.image}</h1>
+        <h1>{container.Names[0]}</h1>
+        <h1>{container.Image}</h1>
     {/if}
 </Header>
 <div class="logs" bind:this={containerElement}>

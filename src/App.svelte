@@ -47,7 +47,7 @@
 <style lang="scss">
     .container {
         display: grid;
-        grid-template-columns: 16em 1fr;
+        grid-template-columns: 12em 1fr;
         grid-template-rows: 1fr;
         gap: 0px 0px;
         grid-template-areas: "navigation content";

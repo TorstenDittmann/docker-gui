@@ -8,8 +8,8 @@
 
     $: filteredImages = $state.images.filter((image) => {
         return (
-            includes(image.id, search) ||
-            image.repo_tags.some((tags) => includes(tags, search))
+            includes(image.Id, search) ||
+            image.RepoTags.some((tags) => includes(tags, search))
         );
     });
 </script>
@@ -22,7 +22,7 @@
     <tbody>
         {#each filteredImages as image}
             <tr>
-                <td>{image.repo_tags[0]}</td>
+                <td>{image.RepoTags[0]}</td>
             </tr>
         {:else}
             no containers

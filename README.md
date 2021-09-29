@@ -2,18 +2,18 @@
 ## Development
 Prepare the repo:
 ```sh
-yarn
+npm i
 ```
 
 Run dev:
 ```sh
-yarn dev
+npm run dev
 ```
 
 Build:
 
 ```sh
-yarn build
+npm run build
 ```
 
 ## ToDo
