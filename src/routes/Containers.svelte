@@ -8,16 +8,16 @@
         ToolbarSearch,
         ToolbarMenu,
         ToolbarMenuItem,
-        Button,
+        TooltipIcon,
         Tag,
-Link,
+        Link,
+        ButtonSet,
+        Button,
     } from "carbon-components-svelte";
-    import BareMetalServer16 from "carbon-icons-svelte/lib/BareMetalServer16";
     import PlayFilledAlt16 from "carbon-icons-svelte/lib/PlayFilledAlt16";
     import StopFilledAlt16 from "carbon-icons-svelte/lib/StopFilledAlt16";
     import Restart16 from "carbon-icons-svelte/lib/Restart16";
     import TrashCan16 from "carbon-icons-svelte/lib/TrashCan16";
-    import { push } from "svelte-spa-router";
     import type { TagProps } from "carbon-components-svelte/types/Tag/Tag";
     import { docker } from "../docker";
 
@@ -40,10 +40,6 @@ Link,
         }
     };
 
-    const openContainer = async (event: CustomEvent) => {
-        await push("/container/" + event.detail.Id);
-    };
-
     $: filteredContainers = $state.containers.filter((container) => {
         return search !== ""
             ? container.Names.some((name) => includes(name, search))
@@ -55,15 +51,16 @@ Link,
     size="short"
     title="Containers"
     description="Your local containers."
+    sortable
     headers={[
         { key: "State", value: "State" },
         { key: "Names", value: "Names" },
         { key: "Image", value: "Image" },
-        { key: "Actions", value: "Actions" },
+        { key: "Actions", empty: true },
     ]}
     rows={filteredContainers}
 >
-    <Toolbar size="sm">
+    <Toolbar>
         <ToolbarContent>
             <ToolbarSearch bind:value={search} />
             <ToolbarMenu>
@@ -83,18 +80,34 @@ Link,
         {:else if cell.key === "Names"}
             <Link href={`/#/container/${row.id}`}>{cell.value}</Link>
         {:else if cell.key === "Actions"}
-            <span on:click={() => docker.container.start(row.id)} class="action">
-                <PlayFilledAlt16 />
-            </span>
-            <span on:click={() => docker.container.stop(row.id)} class="action">
-                <StopFilledAlt16 />
-            </span>
-            <span on:click={() => docker.container.restart(row.id)} class="action">
-                <Restart16 />
-            </span>
-            <span on:click={() => docker.container.delete(row.id)} class="action">
-                <TrashCan16 />
-            </span>
+                <Button
+                    icon={PlayFilledAlt16}
+                    iconDescription="Start"
+                    size="small"
+                    kind="ghost"
+                    on:click={() => docker.container.start(row.id)}
+                />
+                <Button
+                    icon={StopFilledAlt16}
+                    iconDescription="Stop"
+                    size="small"
+                    kind="ghost"
+                    on:click={() => docker.container.stop(row.id)}
+                />
+                <Button
+                    icon={Restart16}
+                    iconDescription="Restart"
+                    size="small"
+                    kind="ghost"
+                    on:click={() => docker.container.restart(row.id)}
+                />
+                <Button
+                    icon={TrashCan16}
+                    iconDescription="Delete"
+                    size="small"
+                    kind="ghost"
+                    on:click={() => docker.container.delete(row.id)}
+                />
         {:else}{cell.value}{/if}
     </span>
 </DataTable>

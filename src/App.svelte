@@ -4,11 +4,9 @@
         SideNav,
         SkipToContent,
         Content,
-        Grid,
-        Row,
-        Column,
         HeaderUtilities,
         HeaderGlobalAction,
+Theme,
     } from "carbon-components-svelte";
     import SettingsAdjust20 from "carbon-icons-svelte/lib/SettingsAdjust20";
 
