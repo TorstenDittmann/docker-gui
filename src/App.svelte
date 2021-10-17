@@ -1,16 +1,29 @@
 <script lang="ts">
+    import {
+        Header,
+        SideNav,
+        SkipToContent,
+        Content,
+        Grid,
+        Row,
+        Column,
+        HeaderUtilities,
+        HeaderGlobalAction,
+    } from "carbon-components-svelte";
+    import SettingsAdjust20 from "carbon-icons-svelte/lib/SettingsAdjust20";
+
     import { invoke } from "@tauri-apps/api/tauri";
 
     import { onMount } from "svelte";
 
     import Router from "svelte-spa-router";
 
-    import Navigation from "./lib/Navigation.svelte";
     import Container from "./routes/Container.svelte";
     import Containers from "./routes/Containers.svelte";
     import Images from "./routes/Images.svelte";
     import Settings from "./routes/Settings.svelte";
     import { global, state } from "./stores";
+    import Navigation from "./lib/Navigation.svelte";
 
     const routes = {
         "/": Containers,
@@ -34,33 +47,23 @@
     const load = async () => {
         await state.containers.load();
         await state.images.load();
-    }
+    };
+
+    let isSideNavOpen = false;
 </script>
 
-<div class="container">
+<Header company="Appwrite" platformName="Docker GUI" bind:isSideNavOpen>
+    <div slot="skip-to-content">
+        <SkipToContent />
+    </div>
+    <HeaderUtilities>
+        <HeaderGlobalAction aria-label="Settings" icon={SettingsAdjust20} />
+    </HeaderUtilities>
+</Header>
+<SideNav bind:isOpen={isSideNavOpen}>
     <Navigation />
-    <main>
-        <Router {routes} />
-    </main>
-</div>
+</SideNav>
 
-<style lang="scss">
-    .container {
-        display: grid;
-        grid-template-columns: 12em 1fr;
-        grid-template-rows: 1fr;
-        gap: 0px 0px;
-        grid-template-areas: "navigation content";
-        height: 100vh;
-        max-height: 100vh;
-        margin: 0;
-        padding: 0;
-
-        main {
-            grid-area: content;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-        }
-    }
-</style>
+<Content>
+    <Router {routes} />
+</Content>

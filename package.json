@@ -11,18 +11,17 @@
     "check": "svelte-check"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.24",
-    "reset-css": "^5.0.1",
-    "sass": "^1.42.1",
-    "svelte": "^3.42.6",
-    "svelte-check": "^2.2.6",
-    "svelte-preprocess": "^4.9.5",
-    "typescript": "^4.4.3",
-    "vite": "^2.5.10"
+    "@sveltejs/vite-plugin-svelte": "^1.0.0-next.28",
+    "carbon-components-svelte": "^0.45.1",
+    "carbon-icons-svelte": "^10.38.0",
+    "sass": "^1.43.2",
+    "svelte": "^3.43.2",
+    "svelte-check": "^2.2.7",
+    "svelte-preprocess": "^4.9.8",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.7"
   },
   "dependencies": {
-    "@fontsource/poppins": "^4.5.0",
-    "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@tauri-apps/api": "^1.0.0-beta.8",
     "@tauri-apps/cli": "^1.0.0-beta.10",
     "svelte-fa": "^2.3.3",

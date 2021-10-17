@@ -1,6 +1,5 @@
+import "carbon-components-svelte/css/g90.css";
 import App from "./App.svelte";
-import "@fontsource/poppins";
-import "./global.scss";
 
 const app = new App({
   target: document.body

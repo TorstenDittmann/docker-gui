@@ -1,7 +1,6 @@
 <script lang="ts">
     import { includes } from "../helpers";
 
-    import Header from "../lib/Header.svelte";
     import { state } from "../stores";
 
     let search = "";
@@ -14,9 +13,6 @@
     });
 </script>
 
-<Header>
-    <input bind:value={search} placeholder="Search..." />
-</Header>
 <h2>Images</h2>
 <table>
     <tbody>
@@ -30,12 +26,3 @@
     </tbody>
 </table>
 
-<style lang="scss">
-    input {
-        line-height: 4rem;
-        font-size: 1.5rem;
-        outline: 0;
-        border: none;
-        width: 100%;
-    }
-</style>

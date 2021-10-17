@@ -1,87 +1,106 @@
 <script lang="ts">
-    import type { Container } from "../stores/state";
     import { state } from "../stores";
-    import ContainerComponent from "../lib/Container.svelte";
-    import Header from "../lib/Header.svelte";
     import { includes } from "../helpers";
-
-    type UIContainers = {
-        compose: {
-            [key: string]: Container[];
-        };
-        singles: Container[];
-    };
+    import {
+        DataTable,
+        Toolbar,
+        ToolbarContent,
+        ToolbarSearch,
+        ToolbarMenu,
+        ToolbarMenuItem,
+        Button,
+        Tag,
+Link,
+    } from "carbon-components-svelte";
+    import BareMetalServer16 from "carbon-icons-svelte/lib/BareMetalServer16";
+    import PlayFilledAlt16 from "carbon-icons-svelte/lib/PlayFilledAlt16";
+    import StopFilledAlt16 from "carbon-icons-svelte/lib/StopFilledAlt16";
+    import Restart16 from "carbon-icons-svelte/lib/Restart16";
+    import TrashCan16 from "carbon-icons-svelte/lib/TrashCan16";
+    import { push } from "svelte-spa-router";
+    import type { TagProps } from "carbon-components-svelte/types/Tag/Tag";
+    import { docker } from "../docker";
 
     let search = "";
 
-    $: filteredContainers = $state.containers
-        .filter((container) => {
-            return search !== ""
-                ? container.Names.some((name) => includes(name, search))
-                : true;
-        })
-        .reduce<UIContainers>(
-            (prev: UIContainers, curr: Container) => {
-                const project =
-                curr?.Labels && "com.docker.compose.project" in curr?.Labels
-                        ? curr.Labels["com.docker.compose.project"]
-                        : false;
+    const getState = (state: string): TagProps["type"] => {
+        switch (state) {
+            case "running":
+                return "green";
 
-                if (project) {
-                    if (!(project in prev.compose)) {
-                        prev.compose[project] = [];
-                    }
+            case "exited":
+                return "red";
 
-                    prev.compose[project].push(curr);
-                } else {
-                    prev.singles.push(curr);
-                }
-                return prev;
-            },
-            {
-                compose: {},
-                singles: [],
-            }
-        );
+            case "kill":
+            case "die":
+                return "purple";
+
+            default:
+                return "gray";
+        }
+    };
+
+    const openContainer = async (event: CustomEvent) => {
+        await push("/container/" + event.detail.Id);
+    };
+
+    $: filteredContainers = $state.containers.filter((container) => {
+        return search !== ""
+            ? container.Names.some((name) => includes(name, search))
+            : true;
+    });
 </script>
 
-<Header>
-    <input bind:value={search} placeholder="Search..." />
-</Header>
-<div class="containers">
-    {#if $state.containers.length !== 0}
-        <div class="section">
-            {#each filteredContainers.singles as container}
-                <ContainerComponent {container} />
-            {/each}
-        </div>
-        {#each Object.keys(filteredContainers.compose) as compose}
-            <div class="section">
-                <h2>{compose}</h2>
-                {#each filteredContainers.compose[compose] as service}
-                    <ContainerComponent container={service} />
-                {/each}
-            </div>
-        {/each}
-    {:else}
-        no containers
-    {/if}
-    </div>
+<DataTable
+    size="short"
+    title="Containers"
+    description="Your local containers."
+    headers={[
+        { key: "State", value: "State" },
+        { key: "Names", value: "Names" },
+        { key: "Image", value: "Image" },
+        { key: "Actions", value: "Actions" },
+    ]}
+    rows={filteredContainers}
+>
+    <Toolbar size="sm">
+        <ToolbarContent>
+            <ToolbarSearch bind:value={search} />
+            <ToolbarMenu>
+                <ToolbarMenuItem primaryFocus>Restart all</ToolbarMenuItem>
+                <ToolbarMenuItem
+                    href="https://cloud.ibm.com/docs/loadbalancer-service"
+                >
+                    API documentation
+                </ToolbarMenuItem>
+                <ToolbarMenuItem danger>Stop all</ToolbarMenuItem>
+            </ToolbarMenu>
+        </ToolbarContent>
+    </Toolbar>
+    <span slot="cell" let:cell let:row>
+        {#if cell.key === "State"}
+            <Tag type={getState(cell.value)} />
+        {:else if cell.key === "Names"}
+            <Link href={`/#/container/${row.id}`}>{cell.value}</Link>
+        {:else if cell.key === "Actions"}
+            <span on:click={() => docker.container.start(row.id)} class="action">
+                <PlayFilledAlt16 />
+            </span>
+            <span on:click={() => docker.container.stop(row.id)} class="action">
+                <StopFilledAlt16 />
+            </span>
+            <span on:click={() => docker.container.restart(row.id)} class="action">
+                <Restart16 />
+            </span>
+            <span on:click={() => docker.container.delete(row.id)} class="action">
+                <TrashCan16 />
+            </span>
+        {:else}{cell.value}{/if}
+    </span>
+</DataTable>
 
-<style lang="scss">
-    .containers {
-        width: 100%;
-
-        .section {
-            width: 100%;
-        }
-    }
-
-    input {
-        line-height: 4rem;
-        font-size: 1.5rem;
-        outline: 0;
-        border: none;
-        width: 100%;
+<style>
+    span.action {
+        cursor: pointer;
     }
 </style>

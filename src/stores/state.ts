@@ -3,6 +3,7 @@ import { mockState } from "../dev/mock";
 import { writable } from "svelte/store";
 
 export type Container = {
+    id: string;
     Created: number;
     Command: string;
     Id: string;
@@ -51,6 +52,10 @@ const createTauriStore = () => {
                 const response = await invoke('containers_list');
                 return update(n => {
                     n.containers = JSON.parse(<string>response);
+                    n.containers.map((container) => {
+                        container.id = container.Id;
+                        return container;
+                    })
                     return n;
                 });
             },
