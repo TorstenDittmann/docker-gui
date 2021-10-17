@@ -112,8 +112,3 @@
     </span>
 </DataTable>
 
-<style>
-    span.action {
-        cursor: pointer;
-    }
-</style>
